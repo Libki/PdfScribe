@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	# Color Value should be set as given below(Case sensitive)
+
+	Name="color" Value="Color"
+	Name="color" Value="Black And White" 
+
+-->
+
+<!--
+
+	# paperSize Value should be set as given below(Case sensitive)
+
+	Name="paperSize" Value="Tabloid"
+	Name="paperSize" Value="Letter"	
+	Name="paperSize" Value="Ledger"
+	Name="paperSize" Value="Legal"
+	Name="paperSize" Value="Statement"
+	Name="paperSize" Value="Executive"
+	Name="paperSize" Value="A0"
+	Name="paperSize" Value="A1"
+	Name="paperSize" Value="A2"
+	Name="paperSize" Value="A3"
+	Name="paperSize" Value="A4"
+	Name="paperSize" Value="A5"
+	Name="paperSize" Value="B4"
+	Name="paperSize" Value="B5"
+-->
+	<Parameters>
+        <Category Name="PrinterSetup">
+            <Parameter Name="PrinterName" Value="PdfScribe" />
+            <Parameter Name="PortName" Value="PSCRIBE" />
+            <Parameter Name="HardwareId" Value="PDFScribe_Driver0101" />
+			<Parameter Name="outputFilePath" Value="D:\\PDF_SCRIBE\\Output" />			
+			<Parameter Name="outputFileName" Value="PdfDoc.pdf" />
+			<Parameter Name="paperSize" Value="Letter" />
+			<Parameter Name="color" Value="Color" />
+		</Category>
+    </Parameters>

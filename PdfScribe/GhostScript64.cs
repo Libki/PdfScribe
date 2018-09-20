@@ -28,7 +28,6 @@ namespace PdfScribe
                 try
                 {
                     int result = NativeMethods.InitAPI(gsInstancePtr, args.Length, args);
-
                     if (result < 0)
                     {
                         throw new ExternalException("Ghostscript conversion error", result);

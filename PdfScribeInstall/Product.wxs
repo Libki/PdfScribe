@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"  xmlns:netfx ="http://schemas.microsoft.com/wix/NetFxExtension">
-	<Product Id="{AF5F6415-3DB9-4B88-B1AE-37D4A736AD3A}" Name="PDF Scribe" Language="1033" Version="1.0.6" Manufacturer="Black Telescope Workshop" UpgradeCode="409ff0d1-1c3a-4f8d-8a5a-350705977809">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"  xmlns:netfx ="http://schemas.microsoft.com/wix/NetFxExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<!--<Product Id="{8372D30B-89F2-4D15-9E8F-1640A609D884}" Name="PDF Scribe" Language="1033" Version="1.0.5" Manufacturer="Black Telescope Workshop" UpgradeCode="409ff0d1-1c3a-4f8d-8a5a-350705977809">-->
+  <Product Id="*" Name="Scribe" Language="1033" Version="1.0.5" Manufacturer="ByWater" UpgradeCode="409ff0d1-1c3a-4f8d-8a5a-350705977809">  
 		<Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" 
              Platform="x64"
              InstallPrivileges="elevated" 
              Description="PDF Scribe Virtual Printer"
-             Comments="PDF Scribe Virtual Printer 1.0.6 installation package"
+             Comments="PDF Scribe Virtual Printer 1.0.5 installation package"
              Id="*" />
-
-		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed."
+    <Property Id ="MyFolder" Value="$(sys.CURRENTDIR)"/>
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed."
                   Schedule="afterInstallValidate"
                   AllowDowngrades="no" AllowSameVersionUpgrades="no"/>
     <MediaTemplate EmbedCab="yes"/>
-
+    
     <Icon Id="AdobeIcon.ico" SourceFile="..\Common\AdobeIcon.ico"/>
     <Property Id="ARPPRODUCTICON" Value="AdobeIcon.ico" />
     
@@ -29,16 +30,31 @@
     <!-- OS version prerequisite -->
     <Condition Message="64-bit Windows Vista SP2, Server 2008 SP2, or later are required."><![CDATA[Installed OR ((VersionNT >= 600 AND ServicePackLevel >= 2 AND VersionNT64)
                                                                                                               OR (VersionNT >= 601 AND VersionNT64))]]></Condition>    
+
     <!-- Check if the user has administrator privileges -->
     <Property Id="MSIUSEREALADMINDETECTION" Value="1" />
+    
+    <Property Id="TRANSFORMS" Value=":instance"/>
+    <!--Creating Nine Instances -->
+    <Property Id="InstanceId" Value="Original" />
+    <InstanceTransforms Property="InstanceId">
+      <Instance Id="instance2" ProductCode="{081DDEDA-EF7B-4266-B7A6-0C86206DA473}" ProductName="Scribe2" />
+      <Instance Id="instance3" ProductCode="{3B7B2529-AFBE-434F-A593-EB8AD8E5DC7F}" ProductName="Scribe3" />
+      <Instance Id="instance4" ProductCode="{F0B7FE65-7424-4863-ADAC-EAFA53E13F02}" ProductName="Scribe4" />
+      <Instance Id="instance5" ProductCode="{024A3E15-D18D-4242-8D88-A553B837B9B2}" ProductName="Scribe5" />
+      <Instance Id="instance6" ProductCode="{17B8F6B6-2866-4D75-AC88-6F0F07A587A2}" ProductName="Scribe6" />
+      <Instance Id="instance7" ProductCode="{3336A300-63C6-40B4-B187-C0EE19040768}" ProductName="Scribe7" />
+      <Instance Id="instance8" ProductCode="{E97CBDF8-F15E-415B-9A70-7A5BEBAD4B2B}" ProductName="Scribe8" />
+      <Instance Id="instance9" ProductCode="{C2CA6A5D-1983-4D5E-8F46-BAA3E63E6475}" ProductName="Scribe9" />
+      <Instance Id="instance10" ProductCode="{ECE7A42D-6F5E-47EF-A78A-E00AC3E3A07C}" ProductName="Scribe10" />
+    </InstanceTransforms>   
 
     <!-- Custom Actions -->
     <Binary Id="PdfScribeInstallCustomAction.CA.dll" SourceFile="$(var.PdfScribeInstallCustomAction.TargetDir)$(var.PdfScribeInstallCustomAction.TargetName).CA.dll" />
     <CustomAction Id="SetCustomActionDataValues"
                   Return="check"
                   Property="InstallPrinter"
-                  Value="DriverSourceDirectory=[INSTALLFOLDER];OutputCommand=[INSTALLFOLDER]PdfScribe.exe;OutputCommandArguments=" />
-                  
+                  Value="CurrentDir=[SourceDir];DriverSourceDirectory=[INSTALLFOLDER];PrinterName=[PRINTERNAME];PortName=[PORTNAME];TRANSFORMS=[TRANSFORMS];HardwareId=[HARDWAREID];OutputCommand=[INSTALLFOLDER]PdfScribe.exe;OutputCommandArguments=" />
     <CustomAction Id="InstallPrinter"
                   Return="check"
                   Execute="deferred"
@@ -49,34 +65,43 @@
                   Execute="deferred"
                   BinaryKey="PdfScribeInstallCustomAction.CA.dll"
                   DllEntry="UninstallPdfScribePrinter" Impersonate="no" />
-
     <InstallExecuteSequence>
       <Custom Action="SetCustomActionDataValues" After="InstallFiles" >NOT Installed</Custom>
-      <Custom Action="InstallPrinter" After="SetCustomActionDataValues"  >NOT Installed</Custom>
+      <Custom Action="InstallPrinter" After="SetCustomActionDataValues"  >NOT Installed</Custom>      
       <Custom Action="UninstallPrinter" Before="RemoveFiles" >(Installed) OR (UPGRADINGPRODUCTCODE) OR (REMOVE)</Custom>
     </InstallExecuteSequence>
 
     <!-- Use the UI that allows an install directory to be chosen-->
+
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
-    <WixVariable Id="WixUILicenseRtf" Value="..\Common\agpl-3.0.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="..\Common\gpl-3.0.rtf" />
     <UIRef Id="WixUI_InstallDir" />
   </Product>
 
-	<Fragment>
-		<Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="ProgramFiles64Folder">
-				<Directory Id="INSTALLFOLDER" Name="PdfScribe" />
-			</Directory>
-		</Directory>
-	</Fragment>
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER" Name="PdfScribe" />
+      </Directory>
+    </Directory>
+  </Fragment>
 
-	<Fragment>
-		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="PdfScribeBase" Guid="{7A339C63-AEA3-491C-8CB1-C78D21426EC1}">
         <File Id="PdfScribeExe" Source="$(var.PdfScribe.TargetPath)" KeyPath="yes" >
           <netfx:NativeImage Id="$(var.PdfScribe.TargetFileName)" Platform="64bit" Priority="1"   />
         </File>
       </Component>
+      <!--Commented SourceDir Action="setValue" Value="[SourceDir]"-->
+      <Component Id="config" Guid="*" >
+        <File Id="configFile" Source="$(var.PdfScribe.TargetDir)..\..\App.config" 
+              KeyPath="yes" Vital="yes" />        
+        <util:XmlFile Id="_PORT_" File="[#configFile]"  
+                        Action="setValue" Value="[TRANSFORMS]"
+                        SelectionLanguage="XPath"
+                        ElementPath="//configuration/userSettings/PdfScribe.Properties.Settings/setting/value" Sequence='1' />
+       </Component>      
       <Component Id="PdfScribeExePdb" Guid="{52D6263A-E94A-47F4-A289-DA128457A341}">
         <File Source="$(var.PdfScribe.TargetDir)$(var.PdfScribe.TargetName).pdb" KeyPath="yes" />
       </Component>
@@ -113,9 +138,9 @@
       <Component Id="SCPDFPRNppd" Guid="{71646658-B1EA-4347-AEEA-3E60999D14E4}">
         <File Source="..\Lib\SCPDFPRN.ppd" KeyPath="yes" />
       </Component>
-
+   
 
       <!-- </Component> -->
-		</ComponentGroup>
-	</Fragment>
+    </ComponentGroup>
+  </Fragment>
 </Wix>

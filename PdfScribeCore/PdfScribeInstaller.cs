@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using System.Text;
 using System.Security;
-
+using System.Windows.Forms;
 using Microsoft.Win32;
 
 namespace PdfScribeCore
@@ -38,21 +38,23 @@ namespace PdfScribeCore
         private readonly String logEventSourceNameDefault = "PdfScribeCore";
 
         const string ENVIRONMENT_64 = "Windows x64";
-        const string PRINTERNAME = "PDF Scribe";
         const string DRIVERNAME = "PDF Scribe Virtual Printer";
-        const string HARDWAREID = "PDFScribe_Driver0101";
+        //const string PRINTERNAME = "PDF Scribe2";
+        //const string HARDWAREID = "PDFScribe_Driver01012";
+        //const string PORTNAME = "PSCRIBE2:";
         const string PORTMONITOR = "PDFSCRIBE";
         const string MONITORDLL = "redmon64pdfscribe.dll";
-        const string PORTNAME = "PSCRIBE:";
         const string PRINTPROCESOR = "winprint";
-
         const string DRIVERMANUFACTURER = "S T Chan";
-        
         const string DRIVERFILE = "PSCRIPT5.DLL";
         const string DRIVERUIFILE = "PS5UI.DLL";
         const string DRIVERHELPFILE = "PSCRIPT.HLP";
         const string DRIVERDATAFILE = "SCPDFPRN.PPD";
-        
+
+        public string PRINTERNAME = "PDF Scribe";
+        public string PORTNAME = "PSCRIBE:";
+        public string HARDWAREID = "PDFScribe_Driver0101";
+ 
         enum DriverFileIndex
         {
             Min = 0,
@@ -101,12 +103,14 @@ namespace PdfScribeCore
         
         #region Constructors
 
+
         public PdfScribeInstaller()
         {
             this.logEventSource = new TraceSource(logEventSourceNameDefault);
             this.logEventSource.Switch = new SourceSwitch("PdfScribeCoreAll");
             this.logEventSource.Switch.Level = SourceLevels.All;
         }
+
         /*
         /// <summary>
         /// This override sets the
@@ -153,10 +157,18 @@ namespace PdfScribeCore
             return portAdded;
         }
 
+        //Function to Update Values for New Instance of printer
+        public bool UpdateVal(string PrinterName,string PortName,string HardwareId) //,string PortMonitor,string DName)
+        {
+            this.PRINTERNAME = PrinterName;
+            this.PORTNAME = PortName;
+            this.HARDWAREID = HardwareId;
+            return true;
+        }
+
         public bool DeletePdfScribePort()
         {
             bool portDeleted = false;
-
             int portDeleteResult = DoXcvDataPortOperation(PORTNAME, PORTMONITOR, "DeletePort");
             switch (portDeleteResult)
             {
@@ -204,7 +216,6 @@ namespace PdfScribeCore
                 uint xcvResult; // Will receive de result here
 
                 NativeMethods.XcvData(hPrinter, xcvDataOperation, portPtr, size, IntPtr.Zero, 0, out needed, out xcvResult);
-
                 NativeMethods.ClosePrinter(hPrinter);
                 Marshal.FreeHGlobal(portPtr);
                 win32ErrorCode = (int)xcvResult;
@@ -627,14 +638,24 @@ namespace PdfScribeCore
 
             if (!DeletePdfScribePrinter())
                 printerUninstalledCleanly = false;
+            //MessageBox.Show("Removed Bool1 = " + printerUninstalledCleanly);
+
             if (!RemovePDFScribePrinterDriver())
                 printerUninstalledCleanly = false;
+            //MessageBox.Show("Removed Bool2 = " + printerUninstalledCleanly);
+
             if (!DeletePdfScribePort())
                 printerUninstalledCleanly = false;
+            //MessageBox.Show("Removed Bool 3= " + printerUninstalledCleanly);
+
             if (!RemovePdfScribePortMonitor())
                 printerUninstalledCleanly = false;
+            //MessageBox.Show("Removed Bool4 = " + printerUninstalledCleanly);
+
             if (!RemovePdfScribePortConfig())
                 printerUninstalledCleanly = false;
+            //MessageBox.Show("Removed Bool5 = " + printerUninstalledCleanly);
+
             DeletePdfScribePortMonitorDll();
             return printerUninstalledCleanly;
         }
@@ -936,7 +957,6 @@ namespace PdfScribeCore
         public bool IsPdfScribePrinterInstalled()
         {
             bool pdfScribeInstalled = false;
-
             PRINTER_DEFAULTS scribeDefaults = new PRINTER_DEFAULTS();
             scribeDefaults.DesiredAccess = 0x00008; // Use access
             scribeDefaults.pDatatype = null;
@@ -1028,12 +1048,28 @@ namespace PdfScribeCore
 
             try
             {
+
+                ///////////////////////////////////////////////////////////////////////////////////
+
+              /*string loc = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                MessageBox.Show("loc= " + loc);
+                string Config = Path.Combine(Path.GetDirectoryName(loc) + "\\App.config");
+                MessageBox.Show("config= " + Config);
+                System.Xml.XmlDocument xmlDoc = new System.Xml.XmlDocument();
+                string fileName = @Config;
+                xmlDoc.Load(fileName);
+                string instance = xmlDoc["configuration"]["userSettings"]["PdfScribe.Properties.Settings"]["setting"]["value"].InnerText;
+                MessageBox.Show("Program" + instance*/
+                /////////////////////////////////////////////////////////////////////////////////////////
+
                 Registry.LocalMachine.DeleteSubKey("SYSTEM\\CurrentControlSet\\Control\\Print\\Monitors\\" +
                                                     PORTMONITOR + "\\Ports\\" + PORTNAME, false);
+                //MessageBox.Show("PortName = " + PORTNAME + " PORTMON = " + PORTMONITOR);
                 registryEntriesRemoved = true;
             }
             catch (UnauthorizedAccessException unauthorizedEx)
             {
+                MessageBox.Show("Uninstalled Successful");
                 logEventSource.TraceEvent(TraceEventType.Error,
                                           (int)TraceEventType.Error,
                                           String.Format(REGISTRYCONFIG_NOT_DELETED, unauthorizedEx.Message));
