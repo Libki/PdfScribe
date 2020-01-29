@@ -30,10 +30,10 @@
 -->
 	<Parameters>
         <Category Name="PrinterSetup">
-            <Parameter Name="PrinterName" Value="PdfScribe" />
-            <Parameter Name="PortName" Value="PSCRIBE" />
-            <Parameter Name="HardwareId" Value="PDFScribe_Driver0101" />
-			<Parameter Name="outputFilePath" Value="D:\\PDF_SCRIBE\\Output" />			
+            <Parameter Name="PrinterName" Value="PdfScribe2" />
+            <Parameter Name="PortName" Value="PSCRIBE2" />
+            <Parameter Name="HardwareId" Value="PDFScribe_Driver01012" />
+			<Parameter Name="outputFilePath" Value="D:\\PDF_SCRIBE\\Output2" />			
 			<Parameter Name="outputFileName" Value="PdfDoc.pdf" />
 			<Parameter Name="paperSize" Value="Letter" />
 			<Parameter Name="color" Value="Color" />

@@ -191,11 +191,13 @@ namespace PdfScribe
                     string extension = Path.GetExtension(outputFilename);
                     string path = Path.GetDirectoryName(outputFilename);
                     string newFullPath = outputFilename;
+                    string newFullPath2 = outputFilename;
                     while (File.Exists(newFullPath))
                     {
                         string tempFileName = string.Format("{0}_{1}", fileNameOnly, count++);
                         newFullPath = Path.Combine(path, tempFileName + extension);
                     }
+                    
 
                     outputFilename = newFullPath;
                     
@@ -328,6 +330,81 @@ namespace PdfScribe
 
                     }
                     GhostScript64.CallAPI(ghostScriptArguments_o);
+
+
+                    int cn = getNumberOfPdfPages(outputFilename);
+                    int c = 0;
+                    while (c<1000)
+                        {
+                        c = c + 1; 
+                        }
+                    //MessageBox.Show("NUMBER OF PAGES=", cn.ToString());
+                    //DialogResult dialogResult = MessageBox.Show(string.Format("You are about to print {0} pages. Do you wish to proceed?", cn.ToString()), "Print Confirmation", MessageBoxButtons.YesNo/*, MessageBoxIcon.Question*/);
+                    //if (dialogResult == DialogResult.Yes)
+                    //{
+                        //do something
+                        string value = "1";
+                        rep:
+                        if (InputBox("Copies", "Enter Number of copies:", ref value) == DialogResult.OK)
+                        {
+                            int n;
+                            bool isNumeric = int.TryParse(value, out n);
+
+                            if (isNumeric == false)
+                            {
+                                MessageBox.Show("Number of copies should be in integer numbers");
+                                goto rep;
+                            }
+                            else
+                            {
+                                //MessageBox.Show(string.Format("Entered copies = {0}", value));
+                                int inval = Convert.ToInt32(value);
+
+                            //MessageBox.Show(String.Format("outputfilename = {0} ", outputFilename));
+                            //MessageBox.Show(String.Format("outputfilepath = {0} ", outputfilepath));
+                            int t_cn = cn * inval;
+                            DialogResult dialogResult = MessageBox.Show(string.Format("You are about to print {0} pages. Do you wish to proceed?", t_cn.ToString()), "Print Confirmation", MessageBoxButtons.YesNo/*, MessageBoxIcon.Question*/);
+                            if (dialogResult == DialogResult.Yes)
+                            {
+                                if (inval > 1)
+                                {
+
+                                    string tempPath = outputfilepath + "\\" + Path.GetFileNameWithoutExtension(outputFilename) + "Copies" + value + ".pdf";
+                                    int cnt = 1;
+                                    while (File.Exists(newFullPath2))
+                                    {
+                                        string tempFileName2 = string.Format("{0}_{1}", fileNameOnly + "Copies" + value, cnt++);
+                                        newFullPath2 = Path.Combine(path, tempFileName2 + extension);
+                                    }
+
+                                    // System.IO.File.Move(outputFilename, outputfilepath + "\\" + Path.GetFileNameWithoutExtension(outputFilename) + "Copies" + value + ".pdf");
+                                    System.IO.File.Move(outputFilename, newFullPath2);
+                                }
+                            }
+                            else if (dialogResult == DialogResult.No)
+                            {
+                                File.Delete(outputFilename);
+                            }
+                            /*for (int i = 1; i < inval; i++)
+                            {
+                                GetPdfOutputFilename(ref outputFilename);
+                                String[] ghostScriptArguments2 = { "-dBATCH", "-dNOPAUSE", "-dSAFER",  "-sDEVICE=pdfwrite","-d.IgnoreNumCopies=false",
+                                            String.Format("-sOutputFile={0}", outputFilename), standardInputFilename,
+                                            "-c", @"[/Creator(PdfScribe 1.0.7 (PSCRIPT5)) /DOCINFO pdfmark", "-f"};
+
+                                GhostScript64.CallAPI(ghostScriptArguments2);
+                            }*/
+                        }
+                    }
+
+
+
+                    //}
+                    //else if (dialogResult == DialogResult.No)
+                    //{
+                    //    File.Delete(outputFilename);
+                    //}
+
                     //MessageBox.Show("File Saved as " + outputFilename);
                 }
             }
@@ -389,6 +466,88 @@ namespace PdfScribe
                 logEventSource.Flush();
             }
         }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static DialogResult InputBox(string title, string promptText, ref string value)
+        {
+            //try
+            //{
+                Form form = new Form();
+                Label label = new Label();
+                TextBox textBox = new TextBox();
+                Button buttonOk = new Button();
+                Button buttonCancel = new Button();
+                //form.Parent = form;
+                form.Text = title;
+                label.Text = promptText;
+                textBox.Text = value;
+
+                buttonOk.Text = "OK";
+                buttonCancel.Text = "Cancel";
+                buttonOk.DialogResult = DialogResult.OK;
+                buttonCancel.DialogResult = DialogResult.Cancel;
+
+                label.SetBounds(9, 20, 372, 13);
+                textBox.SetBounds(12, 36, 372, 20);
+                buttonOk.SetBounds(228, 72, 75, 23);
+                buttonCancel.SetBounds(309, 72, 75, 23);
+
+                label.AutoSize = true;
+                textBox.Anchor = textBox.Anchor | AnchorStyles.Right;
+                buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+                buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+                form.ClientSize = new Size(396, 107);
+                form.Controls.AddRange(new Control[] { label, textBox, buttonOk, buttonCancel });
+                form.ClientSize = new Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
+                form.FormBorderStyle = FormBorderStyle.FixedDialog;
+                form.StartPosition = FormStartPosition.CenterScreen;
+                form.MinimizeBox = false;
+                form.MaximizeBox = false;
+                form.AcceptButton = buttonOk;
+                form.CancelButton = buttonCancel;
+                //form.Visible = true;
+                //form.Activate();
+                form.TopMost = true;
+                form.BringToFront();
+                Form form2 = new Form();
+                form2.Show();
+
+                DialogResult dialogResult= form.ShowDialog();
+                
+                //if (form.ShowDialog() == DialogResult.OK)
+                //{
+                //   // MessageBox.Show("OK");
+                //}
+                
+                value = textBox.Text;
+                //dialogResult = DialogResult.OK;
+                
+                //DialogResult dialogResult = DialogResult.OK;
+                return dialogResult;
+            //}
+            //catch (Exception e){
+            //    MessageBox.Show(e.ToString());
+                
+            //}
+
+            //return DialogResult.OK;
+        }
+
+        //Getting Page count
+        static int getNumberOfPdfPages(string fileName)
+        {
+            using (StreamReader sr = new StreamReader(File.OpenRead(fileName)))
+            {
+                Regex regex = new Regex(@"/Type\s*/Page[^s]");
+                MatchCollection matches = regex.Matches(sr.ReadToEnd());
+
+                return matches.Count;
+            }
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// All unhandled exceptions will bubble their way up here -
         /// a final error dialog will be displayed before the crash and burn
@@ -401,6 +560,7 @@ namespace PdfScribe
                                       (int)TraceEventType.Critical,
                                       ((Exception)e.ExceptionObject).Message + Environment.NewLine +
                                                                         ((Exception)e.ExceptionObject).StackTrace);
+            
             DisplayErrorMessage(errorDialogCaption,
                                 errorDialogInstructionUnexpectedError);
         }

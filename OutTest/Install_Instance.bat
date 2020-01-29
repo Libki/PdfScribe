@@ -29,4 +29,4 @@ if '%errorlevel%' NEQ '0' (
 
 
 
-msiexec /i PdfScribeInstall.msi INSTALLFOLDER="C:\Program Files\PdfScribe2" MSINEWINSTANCE=1 TRANSFORMS=":instance2" /qn
+msiexec /i PdfScribeInstall.msi INSTALLFOLDER="C:\Program Files\PdfScribe3" MSINEWINSTANCE=1 TRANSFORMS=":instance3" /qn
